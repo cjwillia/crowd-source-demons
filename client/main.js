@@ -20,7 +20,7 @@ function letsGetThisPartyStarted() {
 	});
 
 	document.body.addEventListener('touchstart', function() {
-		return;
+		//return;
 		if(document.body.requestFullScreen)
 			document.body.requestFullScreen();
 	});
