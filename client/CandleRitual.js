@@ -36,8 +36,8 @@ CandleRitual.prototype.touch = function(e) {
 
 	for(var i = 0; i < e.touches.length; i++) {
 		var touch = e.touches[i];
-		var xpct = touch.clientX / this.owner.game.canvasSize.w;
-		var ypct = touch.clientY / this.owner.game.canvasSize.h;
+		var xpct = touch.clientX / this.game.canvasSize.w;
+		var ypct = touch.clientY / this.game.canvasSize.h;
 		var dist = distance(xpct, ypct, this.x, this.y);
 		if(dist < this.circleRadius) {
 			this.lit = true;
