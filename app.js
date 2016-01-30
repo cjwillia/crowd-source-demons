@@ -9,6 +9,20 @@ var url = require('url');
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({server: http});
 
+const EventEmitter = require('events');
+const util = require('util');
+
+function SocketEmitter() {
+    EventEmitter.call(this);
+}
+
+util.inherits(SocketEmitter, EventEmitter);
+
+var socketEmitter = new SocketEmitter();
+
+var DemonController = require('./src/demonController.js');
+var RoomController = require('./src/roomController.js');
+
 var app = express();
 
 // view engine setup
@@ -21,11 +35,14 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(express.static(path.join(__dirname, 'client')));
 
 app.get('/', function(req, res, next) {
-    res.sendFile(__dirname + '/public/test.html');
+    res.sendFile(__dirname + '/client/index.html');
+});
+
+app.get('/test', function(req, res, next) {
+    res.sendFile(__dirname + '/client/test.html');
 });
 
 // catch 404 and forward to error handler
@@ -58,6 +75,7 @@ wss.on('connection', function(ws) {
         switch(msg.data) {
             case 'ritualfulfilled':
                 console.log('more souls plz');
+                break;
         }
     });
 

@@ -1,0 +1,22 @@
+<h1>ayy lmao</h1>
+
+<button id="ayy">ayyyyyyyy</button>
+<script type="text/javascript">
+    var testSocket = new WebSocket("ws://localhost:5050");
+
+    testSocket.addEventListener('open', function(event) {
+        console.log('connection open');
+    });
+
+    testSocket.addEventListener('message', function(event) {
+        switch(event.data) {
+            case 'test':
+                testSocket.send('response');
+                break;
+        };
+    });
+
+    document.getElementById("ayy").addEventListener('click', function() {
+        testSocket.send('ritualfulfilled');
+    });
+</script>

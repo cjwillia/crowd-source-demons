@@ -3,6 +3,7 @@ function DemonController(name, time) {
     this.level = 0;
     this.rituals_observed = 0;
     this.summoning_time = time;
+    this.summoning = false;
 }
 
 DemonController.prototype.beginObservingRituals = function() {
@@ -29,3 +30,5 @@ function getChangesFromRitual(ritual) {
         level: 1,
     };
 }
+
+module.exports = DemonController;

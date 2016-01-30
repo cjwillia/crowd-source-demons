@@ -58,3 +58,9 @@ RoomController.prototype.addDemon = function(demon, team) {
 
     receiving_team.demons.push(demon);
 };
+
+RoomController.prototype.getAllSummoners = function() {
+    return this.teams.left.summoners.concat(this.teams.right.summoners);
+};
+
+module.exports = RoomController;
