@@ -1,7 +1,8 @@
 function DemonController(name, time) {
     this.name = name;
     this.level = 0;
-    this.rituals_observed = 0;
+    this.rituals_observed = [];
+    this.num_rituals_observed = 0;
     this.summoning_time = time;
     this.summoning = false;
 }

@@ -1,6 +1,9 @@
 <h1>ayy lmao</h1>
 
 <button id="ayy">ayyyyyyyy</button>
+<button id="lmao">lmao</button>
+<p id="lmaooo"></p>
+<p id="lmfaoo"></p>
 <script type="text/javascript">
     var testSocket = new WebSocket("ws://localhost:5050");
 
@@ -9,14 +12,29 @@
     });
 
     testSocket.addEventListener('message', function(event) {
-        switch(event.data) {
+        var thing = event.data.split(":")[0];
+        console.log(event.data);
+        switch(thing) {
             case 'test':
                 testSocket.send('response');
+                break;
+            case 'roomcreated':
+                document.getElementById("lmaooo").innerHTML = "AYYYYYYYYYYY (room created)";
+                break;
+            case 'notready':
+                document.getElementById("lmfaoo").innerHTML = "LMFAO U DON'T HAVE ENOUGH PEOPLE LOL";
+                break;
+            case 'gamestarted':
+                document.getElementById("lmfaoo").innerHTML = "wat";
                 break;
         };
     });
 
     document.getElementById("ayy").addEventListener('click', function() {
-        testSocket.send('ritualfulfilled');
+        testSocket.send('createroom:' + JSON.stringify({test: 'data'}));
+    });
+
+    document.getElementById("lmao").addEventListener('click', function() {
+        testSocket.send('startsummoning:' + JSON.stringify({test: "mo' data"}));
     });
 </script>
