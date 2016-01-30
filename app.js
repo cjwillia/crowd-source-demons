@@ -9,8 +9,6 @@ var url = require('url');
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({server: http});
 
-var testRoute = require('./routes/index');
-
 var app = express();
 
 // view engine setup
@@ -25,7 +23,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//app.use('/', testRoute);
 
 app.get('/', function(req, res, next) {
     res.sendFile(__dirname + '/public/test.html');
@@ -59,12 +56,12 @@ wss.on('connection', function(ws) {
 
     ws.addEventListener('message', function(msg) {
         switch(msg.data) {
-            case 'response':
-                console.log('got a test message from the client!');
+            case 'ritualfulfilled':
+                console.log('more souls plz');
         }
     });
 
-    ws.send('test');
+    ws.send('ready');
 });
 
 // server initialization
