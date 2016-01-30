@@ -10,10 +10,14 @@ function CandleRitual(game) {
 
 	this.touchBound = this.touch.bind(this);
 
-	game.canvas.addEventListener('touchstart', this.touchBound);
 }
 
 CandleRitual.prototype = Object.create(Ritual.prototype);
+
+CandleRitual.prototype.activate = function() {
+	Ritual.prototype.activate.apply(this, arguments);
+	game.canvas.addEventListener('touchstart', this.touchBound);
+}
 
 CandleRitual.prototype.draw = function() {
 	for(var i = 0; i < this.candles.length; i++) {
