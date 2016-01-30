@@ -1,12 +1,11 @@
-addEventListener('load', letsGetThisPartyStarted);
-
 function Game(canvas) {
 	this.canvas = canvas;
-	this.listenForStuff();
 	this.ctx = this.canvas.getContext('2d');
 	this.rituals = [];
 	this.lastTick = 0;
 
+	if(!localStorage.getItem('axis'))
+		this.setup = new Setup(this);
 
 	this.canvasSize = {
 		w: 0,
@@ -15,7 +14,8 @@ function Game(canvas) {
 		max: 0
 	};
 
-	this.sizeCanvas(canvas);	
+	this.sizeCanvas(canvas);
+
 	addEventListener('resize', this.sizeCanvas.bind(this));
 
 	this.scheduleTick();
@@ -29,7 +29,12 @@ Game.prototype.addRitual = function(ritual) {
 Game.prototype.tick = function(dt, timestamp) {
 	var ritual = this.rituals[0];
 
-	if(ritual) {
+	if(!this.setup && ritual) {
+		if(!ritual.active)
+			ritual.activate();
+		if(!ritual.active)
+			throw new Error("Activating ritual didn't activate it?");
+
 		ritual.tick(dt);
 		if(ritual.isFulfilled())
 			this.rituals.shift().destroy();
@@ -38,20 +43,18 @@ Game.prototype.tick = function(dt, timestamp) {
 	this.draw(dt);
 };
 
-Game.prototype.listenForStuff = function() {
-	['touchstart', 'touchend', 'touchmove', 'touchcancel'].forEach(function(type) {
-		this.canvas.addEventListener(type, function(e) {
-			if(this.rituals[0])
-				this.rituals[0].handleTouchEvent(type, e);
-		}.bind(this));
-	}, this);
-};
-
 Game.prototype.draw = function(dt) {
 	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.fillStyle = '#F44';
+	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.fillStyle = 'black';
 
-	if(this.rituals[0])
-		this.rituals[0].draw(this.ctx, this.canvasSize);
+	if(this.setup)
+		this.setup.draw(this.ctx, this.canvasSize);
+	else {
+		if(this.rituals[0])
+			this.rituals[0].draw(this.ctx, this.canvasSize);
+	}
 
 	this.drawHUD(dt);
 };
@@ -95,17 +98,3 @@ Game.prototype.sizeCanvas = function() {
 		max: max
 	};
 };
-
-function letsGetThisPartyStarted() {
-	var canvas = document.querySelector('canvas');
-
-	var game = window.game = new Game(canvas);
-
-	game.addRitual(new TypingRitual('Skullz'));
-	game.addRitual(new CandleRitual());
-
-	document.body.addEventListener('touchstart', function() {
-		if(document.body.requestFullScreen)
-			document.body.requestFullScreen();
-	});
-}
