@@ -1,3 +1,6 @@
+var candleSound = document.createElement('audio');
+candleSound.src = 'sounds/candle.ogg';
+
 function CandleRitual() {
 	Ritual.apply(this, arguments);
 	this.x = this.config.x;
@@ -35,7 +38,7 @@ CandleRitual.prototype.touch = function(e) {
 		var touch = e.touches[i];
 		var xpct = touch.clientX / this.owner.game.canvasSize.w;
 		var ypct = touch.clientY / this.owner.game.canvasSize.h;
-		var dist = Math.sqrt(Math.pow(xpct - this.x, 2) + Math.pow(ypct - this.y, 2));
+		var dist = distance(xpct, ypct, this.x, this.y);
 		if(dist < this.circleRadius) {
 			this.lit = true;
 			this.sound.play();

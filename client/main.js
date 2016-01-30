@@ -8,6 +8,7 @@ function letsGetThisPartyStarted() {
 	connection.addEventListener('open', function() {
 		var game = window.game = new Game(canvas, connection);
 
+		game.addRitual(new DemonChordRitual(game, {count: 5}));
 		game.addRitual(new TypingRitual(game, {incantation:'Skullz'}));
 		game.addRitual(new CandlesRitual(game, {count: 5}));
 		game.addRitual(new RotationRitual(game, {targetAngle:Math.random() * 100 - 50}));
@@ -23,4 +24,8 @@ function letsGetThisPartyStarted() {
 		if(document.body.requestFullScreen)
 			document.body.requestFullScreen();
 	});
+}
+
+function distance(x1, y1, x2, y2) {
+	return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }
