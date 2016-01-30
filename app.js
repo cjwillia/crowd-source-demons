@@ -4,6 +4,10 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var http = require('http').createServer();
+var url = require('url');
+var WebSocketServer = require('ws').Server;
+var wss = new WebSocketServer({server: http});
 
 var testRoute = require('./routes/index');
 
@@ -46,14 +50,33 @@ app.use(function(err, req, res, next) {
   });
 });
 
-var server = app.listen(5050, function() {
-    var host = server.address().address;
-    var port = server.address().port;
+// websocket nonsense etc
+
+wss.on('connection', function(ws) {
+    url.parse(ws.upgradeReq.url, true);
+
+    console.log('client is connected');
+
+    ws.addEventListener('message', function(msg) {
+        switch(msg.data) {
+            case 'response':
+                console.log('got a test message from the client!');
+        }
+    });
+
+    ws.send('test');
+});
+
+// server initialization
+
+http.on('request', app);
+http.listen(5050, function() {
+    var host = http.address().address;
+    var port = http.address().port;
 
     host = host === "::" ? "localhost" : host;
 
     console.log('To do application is listening on %s:%s', host, port);
 });
-
 
 module.exports = app;

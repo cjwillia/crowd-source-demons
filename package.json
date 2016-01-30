@@ -12,7 +12,8 @@
     "express": "^4.13.4",
     "jade": "~1.11.0",
     "morgan": "~1.6.1",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "ws": "^1.0.1"
   },
   "description": "crowd source demon summoning game for global game jam 2016",
   "main": "app.js",

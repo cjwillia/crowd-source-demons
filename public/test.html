@@ -1,1 +1,19 @@
 <h1>ayy lmao</h1>
+
+
+<script type="text/javascript">
+    var testSocket = new WebSocket("ws://localhost:5050");
+
+    testSocket.addEventListener('open', function(event) {
+        console.log('connection open');
+    });
+
+    testSocket.addEventListener('message', function(event) {
+        switch(event.data) {
+            case 'test':
+                testSocket.send('response');
+                break;
+        };
+    });
+
+</script>
