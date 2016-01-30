@@ -1,6 +1,9 @@
-function RotationRitual(game, targetAngle) {
+var rotationSound = document.createElement('audio');
+rotationSound.src = 'sounds/white-noise.ogg';
+
+function RotationRitual(game, config) {
 	Ritual.apply(this, arguments);
-	this.targetAngle = targetAngle;
+	this.targetAngle = config.targetAngle;
 	this.actualAngle = 0;
 
 	this.orientedBound = this.oriented.bind(this);
@@ -8,6 +11,8 @@ function RotationRitual(game, targetAngle) {
 	this.axis = localStorage.getItem('axis') || 'gamma';
 
 	this.heldSeconds = 0;
+
+	this.sound = rotationSound.cloneNode();
 }
 
 RotationRitual.prototype = Object.create(Ritual.prototype);
@@ -26,10 +31,18 @@ RotationRitual.prototype.tick = function(dt) {
 	if(!this.active)
 		return;
 
-	if(Math.abs(this.targetAngle - this.actualAngle) < this.tolerance)
+	if(Math.abs(this.targetAngle - this.actualAngle) < this.tolerance) {
+		if(this.heldSeconds == 0)
+			this.sound.play();
 		this.heldSeconds += dt / 1000;
-	else
+	}
+	else {
 		this.heldSeconds = Math.max(0, this.heldSeconds - dt / 300);
+		if(this.sound.currentTime) {
+			this.sound.pause()
+			this.sound.currentTime = 0;
+		}
+	}
 };
 
 RotationRitual.prototype.isFulfilled = function() {
@@ -56,18 +69,29 @@ RotationRitual.prototype.draw = function(ctx, canvasSize) {
 
 	ctx.sr(function() {
 		ctx.beginPath();
-		ctx.translate(canvasSize.w / 2 + shakeX, canvasSize.h / 2 + shakeY);
-		ctx.arc(0, 0, r, 0, 2 * Math.PI, false);
+
+		ctx.lineWidth = 2;
+
+		ctx.translate(canvasSize.w / 2, canvasSize.h / 2);
+		ctx.arc(shakeX, shakeY, r, 0, 2 * Math.PI, false);
 		ctx.stroke();
+
+		shakeAngle = Math.random() * 2 * Math.PI;
+		shakeX = Math.cos(shakeAngle) * shakeMagnitude;
+		shakeY = Math.sin(shakeAngle) * shakeMagnitude;
 
 		ctx.beginPath();
 		for(var i = 0; i < 6; i++) {
 			var angle = (4 * i + 0.5) * Math.PI/5 - (self.targetAngle / 180 * Math.PI);
 			var x = Math.cos(angle) * r;
 			var y = Math.sin(angle) * r;
-			ctx.lineTo(x, y);
+			ctx.lineTo(x + shakeX, y + shakeY);
 		}
 		ctx.stroke();
+
+		shakeAngle = Math.random() * 2 * Math.PI;
+		shakeX = Math.cos(shakeAngle) * shakeMagnitude;
+		shakeY = Math.sin(shakeAngle) * shakeMagnitude;
 
 		ctx.beginPath();
 		ctx.strokeStyle = '#800';
@@ -75,11 +99,11 @@ RotationRitual.prototype.draw = function(ctx, canvasSize) {
 			var angle = (4 * i + 0.5) * Math.PI/5 - (self.actualAngle / 180 * Math.PI);
 			var x = Math.cos(angle) * r;
 			var y = Math.sin(angle) * r;
-			ctx.lineTo(x, y);
+			ctx.lineTo(x + shakeX, y + shakeY);
 		}
 		ctx.stroke();
 	});
-}
+};
 
 RotationRitual.prototype.destroy = function() {
 	Ritual.prototype.destroy.apply(this, arguments);

@@ -1,62 +1,36 @@
-function CandleRitual(game) {
-	Ritual.apply(this, arguments);
-	this.candles = [];
+var candleSound = document.createElement('audio');
+candleSound.src = 'sounds/candle.ogg';
 
-	for(var i = 0; i < 5; i++) {
-		var candle = new Candle(Math.random(), Math.random())
-		candle.owner = this;
-		this.candles.push(candle);
-	}
+function CandleRitual() {
+	Ritual.apply(this, arguments);
+	this.x = this.config.x;
+	this.y = this.config.y;
+
+	this.lit = false;
+
+	this.sound = candleSound.cloneNode();
 
 	this.touchBound = this.touch.bind(this);
-
 }
 
 CandleRitual.prototype = Object.create(Ritual.prototype);
 
+CandleRitual.prototype.circleRadius = 0.05;
+CandleRitual.prototype.width = 0.04;
+CandleRitual.prototype.height = 0.1;
+CandleRitual.prototype.wickWidth = 0.01;
+CandleRitual.prototype.wickHeight = 0.02;
+
 CandleRitual.prototype.activate = function() {
 	Ritual.prototype.activate.apply(this, arguments);
-	game.canvas.addEventListener('touchstart', this.touchBound);
-}
-
-CandleRitual.prototype.draw = function() {
-	for(var i = 0; i < this.candles.length; i++) {
-		var candle = this.candles[i];
-		candle.draw.apply(candle, arguments);
-	}
+	this.game.canvas.addEventListener('touchstart', this.touchBound);
 };
 
 CandleRitual.prototype.isFulfilled = function() {
-	for(var i = 0; i < this.candles.length; i++)
-		if(!this.candles[i].lit)
-			return false;
-	return true;
+	return this.lit;
 };
 
-CandleRitual.prototype.touch = function() {
-	for(var i = 0; i < this.candles.length; i++)
-		this.candles[i].touch.apply(this.candles[i], arguments);
-}
-
-CandleRitual.prototype.destroy = function() {
-	Ritual.prototype.destroy.apply(this, arguments);
-	this.game.canvas.removeEventListener('touchstart', this.touchBound);
-}
-
-function Candle(x, y) {
-	this.x = x;
-	this.y = y;
-
-	this.lit = false;
-}
-
-Candle.prototype.circleRadius = 0.05;
-Candle.prototype.width = 0.04;
-Candle.prototype.height = 0.1;
-Candle.prototype.wickWidth = 0.01;
-Candle.prototype.wickHeight = 0.02;
-
-Candle.prototype.touch = function(e) {
+CandleRitual.prototype.touch = function(e) {
 	if(this.lit)
 		return;
 
@@ -64,13 +38,15 @@ Candle.prototype.touch = function(e) {
 		var touch = e.touches[i];
 		var xpct = touch.clientX / this.owner.game.canvasSize.w;
 		var ypct = touch.clientY / this.owner.game.canvasSize.h;
-		var dist = Math.sqrt(Math.pow(xpct - this.x, 2) + Math.pow(ypct - this.y, 2));
-		if(dist < this.circleRadius)
+		var dist = distance(xpct, ypct, this.x, this.y);
+		if(dist < this.circleRadius) {
 			this.lit = true;
+			this.sound.play();
+		}
 	}
 };
 
-Candle.prototype.draw = function(ctx, canvasSize) {
+CandleRitual.prototype.draw = function(ctx, canvasSize) {
 	var radPix = this.circleRadius * canvasSize.min;
 	var widthPix = this.width * canvasSize.min;
 	var heightPix = this.height * canvasSize.min;
@@ -100,4 +76,9 @@ Candle.prototype.draw = function(ctx, canvasSize) {
 			ctx.fill();
 		}
 	});
+};
+
+CandleRitual.prototype.destroy = function() {
+	Ritual.prototype.destroy.apply(this, arguments);
+	this.game.canvas.removeEventListener('touchstart', this.touchBound);
 };

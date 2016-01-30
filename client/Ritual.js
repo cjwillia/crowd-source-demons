@@ -1,5 +1,6 @@
-function Ritual(game) {
+function Ritual(game, config) {
 	this.game = game;
+	this.config = config;
 	this.active = false;
 }
 
