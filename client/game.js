@@ -7,6 +7,7 @@ function Game(canvas) {
 	this.rituals = [];
 	this.lastTick = 0;
 
+
 	this.canvasSize = {
 		w: 0,
 		h: 0,
@@ -101,4 +102,9 @@ function letsGetThisPartyStarted() {
 	var game = window.game = new Game(canvas);
 
 	game.addRitual(new CandleRitual());
+
+	document.body.addEventListener('touchstart', function() {
+		if(document.body.requestFullScreen)
+			document.body.requestFullScreen();
+	});
 }
