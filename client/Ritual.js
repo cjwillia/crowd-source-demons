@@ -1,4 +1,5 @@
-function Ritual() {
+function Ritual(game) {
+	this.game = game;
 }
 
 Ritual.prototype.tick = function(ts) {
@@ -14,9 +15,5 @@ Ritual.prototype.isFulfilled = function() {
 };
 
 Ritual.prototype.destroy = function() {
-
-};
-
-Ritual.prototype.handleTouchEvent = function(type, e) {
 
 };

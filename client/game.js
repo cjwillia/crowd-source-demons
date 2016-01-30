@@ -2,7 +2,6 @@ addEventListener('load', letsGetThisPartyStarted);
 
 function Game(canvas) {
 	this.canvas = canvas;
-	this.listenForStuff();
 	this.ctx = this.canvas.getContext('2d');
 	this.rituals = [];
 	this.lastTick = 0;
@@ -36,15 +35,6 @@ Game.prototype.tick = function(dt, timestamp) {
 	}
 
 	this.draw(dt);
-};
-
-Game.prototype.listenForStuff = function() {
-	['touchstart', 'touchend', 'touchmove', 'touchcancel'].forEach(function(type) {
-		this.canvas.addEventListener(type, function(e) {
-			if(this.rituals[0])
-				this.rituals[0].handleTouchEvent(type, e);
-		}.bind(this));
-	}, this);
 };
 
 Game.prototype.draw = function(dt) {
@@ -101,8 +91,9 @@ function letsGetThisPartyStarted() {
 
 	var game = window.game = new Game(canvas);
 
-	game.addRitual(new TypingRitual('Skullz'));
-	game.addRitual(new CandleRitual());
+	game.addRitual(new RotationRitual());
+//	game.addRitual(new TypingRitual(game, 'Skullz'));
+//	game.addRitual(new CandleRitual(game));
 
 	document.body.addEventListener('touchstart', function() {
 		if(document.body.requestFullScreen)

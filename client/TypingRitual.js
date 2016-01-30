@@ -1,4 +1,4 @@
-function TypingRitual(thingToType) {
+function TypingRitual(game, thingToType) {
 	Ritual.apply(this, arguments);
 	this.thingToType = thingToType;
 

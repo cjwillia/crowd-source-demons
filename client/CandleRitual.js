@@ -1,4 +1,4 @@
-function CandleRitual(id) {
+function CandleRitual(game) {
 	Ritual.apply(this, arguments);
 	this.candles = [];
 
@@ -7,6 +7,10 @@ function CandleRitual(id) {
 		candle.owner = this;
 		this.candles.push(candle);
 	}
+
+	this.touchBound = this.touch.bind(this);
+
+	game.canvas.addEventListener('touchstart', this.touchBound);
 }
 
 CandleRitual.prototype = Object.create(Ritual.prototype);
@@ -25,12 +29,15 @@ CandleRitual.prototype.isFulfilled = function() {
 	return true;
 };
 
-CandleRitual.prototype.handleTouchEvent = function() {
-	for(var i = 0; i < this.candles.length; i++) {
-		this.candles[i].handleTouchEvent.apply(this.candles[i], arguments);
-	}
+CandleRitual.prototype.touch = function() {
+	for(var i = 0; i < this.candles.length; i++)
+		this.candles[i].touch.apply(this.candles[i], arguments);
 }
 
+CandleRitual.prototype.destroy = function() {
+	Ritual.prototype.destroy.apply(this, arguments);
+	this.game.canvas.removeEventListener('touchstart', this.touchBound);
+}
 
 function Candle(x, y) {
 	this.x = x;
@@ -45,10 +52,7 @@ Candle.prototype.height = 0.1;
 Candle.prototype.wickWidth = 0.01;
 Candle.prototype.wickHeight = 0.02;
 
-Candle.prototype.handleTouchEvent = function(type, e) {
-	if(type != 'touchstart')
-		return;
-
+Candle.prototype.touch = function(e) {
 	if(this.lit)
 		return;
 
