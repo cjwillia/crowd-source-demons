@@ -101,6 +101,7 @@ function letsGetThisPartyStarted() {
 
 	var game = window.game = new Game(canvas);
 
+	game.addRitual(new TypingRitual('Skullz'));
 	game.addRitual(new CandleRitual());
 
 	document.body.addEventListener('touchstart', function() {
