@@ -9,7 +9,7 @@ function letsGetThisPartyStarted() {
 		var game = window.game = new Game(canvas, connection);
 
 		game.addRitual(new TypingRitual(game, {incantation:'Skullz'}));
-		game.addRitual(new CandleRitual(game, {count: 5}));
+		game.addRitual(new CandlesRitual(game, {count: 5}));
 		game.addRitual(new RotationRitual(game, {targetAngle:Math.random() * 100 - 50}));
 	});
 

@@ -1,4 +1,19 @@
-function CandleRitual() {
+function CandlesRitual(game, config) {
+	MetaRitual.apply(this, arguments);
+
+	for(var i = 0; i < this.config.count; i++) {
+		var candle = new CandleRitual(game, {x: Math.random(), y: Math.random()});
+		candle.owner = this;
+		this.subrituals.push(candle);
+	}
+}
+
+CandlesRitual.prototype = Object.create(MetaRitual.prototype);
+
+var candleSound = document.createElement('audio');
+candleSound.src = 'sounds/candle.ogg';
+
+function Candle() {
 	Ritual.apply(this, arguments);
 	this.x = this.config.x;
 	this.y = this.config.y;
@@ -10,24 +25,24 @@ function CandleRitual() {
 	this.touchBound = this.touch.bind(this);
 }
 
-CandleRitual.prototype = Object.create(Ritual.prototype);
+Candle.prototype = Object.create(Ritual.prototype);
 
-CandleRitual.prototype.circleRadius = 0.05;
-CandleRitual.prototype.width = 0.04;
-CandleRitual.prototype.height = 0.1;
-CandleRitual.prototype.wickWidth = 0.01;
-CandleRitual.prototype.wickHeight = 0.02;
+Candle.prototype.circleRadius = 0.05;
+Candle.prototype.width = 0.04;
+Candle.prototype.height = 0.1;
+Candle.prototype.wickWidth = 0.01;
+Candle.prototype.wickHeight = 0.02;
 
-CandleRitual.prototype.activate = function() {
+Candle.prototype.activate = function() {
 	Ritual.prototype.activate.apply(this, arguments);
 	this.game.canvas.addEventListener('touchstart', this.touchBound);
 };
 
-CandleRitual.prototype.isFulfilled = function() {
+Candle.prototype.isFulfilled = function() {
 	return this.lit;
 };
 
-CandleRitual.prototype.touch = function(e) {
+Candle.prototype.touch = function(e) {
 	if(this.lit)
 		return;
 
@@ -43,7 +58,7 @@ CandleRitual.prototype.touch = function(e) {
 	}
 };
 
-CandleRitual.prototype.draw = function(ctx, canvasSize) {
+Candle.prototype.draw = function(ctx, canvasSize) {
 	var radPix = this.circleRadius * canvasSize.min;
 	var widthPix = this.width * canvasSize.min;
 	var heightPix = this.height * canvasSize.min;
@@ -75,7 +90,7 @@ CandleRitual.prototype.draw = function(ctx, canvasSize) {
 	});
 };
 
-CandleRitual.prototype.destroy = function() {
+Candle.prototype.destroy = function() {
 	Ritual.prototype.destroy.apply(this, arguments);
 	this.game.canvas.removeEventListener('touchstart', this.touchBound);
 };
