@@ -8,7 +8,7 @@ function DemonController(name, time) {
 DemonController.prototype.beginObservingRituals = function() {
     var this_demon = this;
     this.summoning = true;
-    setTimeout(this_demon.stopObservingRituals);
+    setTimeout(this_demon.stopObservingRituals, this.summoning_time);
 };
 
 DemonController.prototype.observeRitual = function(ritual) {
