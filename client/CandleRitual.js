@@ -2,9 +2,11 @@ function CandleRitual(id) {
 	Ritual.apply(this, arguments);
 	this.candles = [];
 
-	for(var i = 0; i < 5; i++)
-		this.candles.push(new Candle(Math.random(), Math.random()));
-	
+	for(var i = 0; i < 5; i++) {
+		var candle = new Candle(Math.random(), Math.random())
+		candle.owner = this;
+		this.candles.push(candle);
+	}
 }
 
 CandleRitual.prototype = Object.create(Ritual.prototype);
@@ -23,6 +25,12 @@ CandleRitual.prototype.isFulfilled = function() {
 	return true;
 };
 
+CandleRitual.prototype.handleTouchEvent = function() {
+	for(var i = 0; i < this.candles.length; i++) {
+		this.candles[i].handleTouchEvent.apply(this.candles[i], arguments);
+	}
+}
+
 
 function Candle(x, y) {
 	this.x = x;
@@ -32,7 +40,56 @@ function Candle(x, y) {
 }
 
 Candle.prototype.circleRadius = 0.05;
+Candle.prototype.width = 0.04;
+Candle.prototype.height = 0.1;
+Candle.prototype.wickWidth = 0.01;
+Candle.prototype.wickHeight = 0.02;
 
-Candle.prototype.draw = function(ctx) {
-	
+Candle.prototype.handleTouchEvent = function(type, e) {
+	if(type != 'touchstart')
+		return;
+
+	if(this.lit)
+		return;
+
+	for(var i = 0; i < e.touches.length; i++) {
+		var touch = e.touches[i];
+		var xpct = touch.clientX / this.owner.game.canvasSize.w;
+		var ypct = touch.clientY / this.owner.game.canvasSize.h;
+		var dist = Math.sqrt(Math.pow(xpct - this.x, 2) + Math.pow(ypct - this.y, 2));
+		if(dist < this.circleRadius)
+			this.lit = true;
+	}
+};
+
+Candle.prototype.draw = function(ctx, canvasSize) {
+	var radPix = this.circleRadius * canvasSize.min;
+	var widthPix = this.width * canvasSize.min;
+	var heightPix = this.height * canvasSize.min;
+
+	var self = this;
+
+	ctx.sr(function() {	
+
+		//body
+		ctx.beginPath();
+		ctx.fillStyle = '#F88';
+		ctx.fillRect(self.x * canvasSize.w - widthPix/2, self.y * canvasSize.h, widthPix, heightPix);
+		ctx.fill();
+
+		//wick
+		ctx.beginPath();
+		ctx.fillStyle = '#787878';
+		ctx.fillRect(self.x * canvasSize.w - self.wickWidth * canvasSize.min / 2,
+			self.y * canvasSize.h - self.wickHeight * canvasSize.min,
+			self.wickWidth * canvasSize.min, self.wickHeight * canvasSize.min);
+		ctx.fill();
+
+		if(self.lit) {
+			ctx.beginPath();
+			ctx.fillStyle = 'white';
+			ctx.arc(self.x * canvasSize.w, self.y * canvasSize.h, radPix, 0, 2 * Math.PI, false);
+			ctx.fill();
+		}
+	});
 };
