@@ -10,6 +10,7 @@ function RoomController() {
             demons: []
         }
     };
+    this.started = false;
 }
 
 RoomController.prototype.addSummoner = function(summoner) {
@@ -61,6 +62,16 @@ RoomController.prototype.addDemon = function(demon, team) {
 
 RoomController.prototype.getAllSummoners = function() {
     return this.teams.left.summoners.concat(this.teams.right.summoners);
+};
+
+RoomController.prototype.readyToStart = function() {
+    return this.teams.left.summoners.length && this.teams.right.summoners.length;
+};
+
+RoomController.prototype.startGame = function(demons) {
+    this.teams.left.demons.push(demons.pop());
+    this.teams.right.demons.push(demons.pop());
+    this.started = true;
 };
 
 module.exports = RoomController;

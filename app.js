@@ -11,6 +11,7 @@ var wss = new WebSocketServer({server: http});
 
 const EventEmitter = require('events');
 const util = require('util');
+const SUMMONING_TIME = 1000 * 60 * 3;
 
 function SocketEmitter() {
     EventEmitter.call(this);
@@ -20,7 +21,10 @@ util.inherits(SocketEmitter, EventEmitter);
 
 var socketEmitter = new SocketEmitter();
 
+var room;
+
 var DemonController = require('./src/demonController.js');
+var SummonerController = require('./src/summonerController.js');
 var RoomController = require('./src/roomController.js');
 
 var app = express();
@@ -66,17 +70,50 @@ app.use(function(err, req, res, next) {
 
 // websocket nonsense etc
 
+socketEmitter.on('ritualfulfilled', function(data, ws) {
+    console.log(data);
+});
+
+socketEmitter.on('createroom', function(data, ws) {
+    room = new RoomController();
+    wss.clients.forEach(function(client) {
+        client.send(serializeData('roomcreated', {}));
+    });
+});
+
+socketEmitter.on('joingame', function(data, ws) {
+    if(room) {
+        var summoner = new SummonerController(name, ws);
+        room.addSummoner(summoner);
+    }
+    else {
+        ws.send(serializeData('noroom', {}));
+    }
+});
+
+socketEmitter.on('startsummoning', function(data, ws) {
+    if(room.readyToStart()) {
+        var demons = makeSomeDemons();
+        room.startGame(demons);
+        wss.clients.forEach(function(client) {
+            client.send(serializeData('gamestarted', {num_players: room.getAllSummoners.length}));
+        });
+    }
+    else {
+        ws.send(serializeData('notready', {}));
+    }
+});
+
 wss.on('connection', function(ws) {
     url.parse(ws.upgradeReq.url, true);
 
     console.log('client is connected');
 
     ws.addEventListener('message', function(msg) {
-        switch(msg.data) {
-            case 'ritualfulfilled':
-                console.log('more souls plz');
-                break;
-        }
+        var strs = msg.data.match(/(\w+):(.*)/);
+        var event_type = strs[1];
+        var data = JSON.parse(strs[2]);
+        socketEmitter.emit(event_type, data, ws);
     });
 
     ws.send('ready');
@@ -93,5 +130,17 @@ http.listen(5050, function() {
 
     console.log('To do application is listening on %s:%s', host, port);
 });
+
+// et cetera
+
+function serializeData(event_type, data) {
+    return event_type + ":" + JSON.stringify(data);
+}
+
+function makeSomeDemons() {
+    var d1 = new DemonController("ima demon :(", SUMMONING_TIME);
+    var d2 = new DemonController("me2 wtf :(((", SUMMONING_TIME);
+    return [d1, d2];
+}
 
 module.exports = app;
