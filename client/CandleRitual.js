@@ -1,8 +1,8 @@
-function CandleRitual(game) {
+function CandleRitual(game, config) {
 	Ritual.apply(this, arguments);
 	this.candles = [];
 
-	for(var i = 0; i < 5; i++) {
+	for(var i = 0; i < this.config.count; i++) {
 		var candle = new Candle(Math.random(), Math.random())
 		candle.owner = this;
 		this.candles.push(candle);
@@ -43,11 +43,16 @@ CandleRitual.prototype.destroy = function() {
 	this.game.canvas.removeEventListener('touchstart', this.touchBound);
 }
 
+var candleSound = document.createElement('audio');
+candleSound.src = 'sounds/candle.ogg';
+
 function Candle(x, y) {
 	this.x = x;
 	this.y = y;
 
 	this.lit = false;
+
+	this.sound = candleSound.cloneNode();
 }
 
 Candle.prototype.circleRadius = 0.05;
@@ -65,8 +70,10 @@ Candle.prototype.touch = function(e) {
 		var xpct = touch.clientX / this.owner.game.canvasSize.w;
 		var ypct = touch.clientY / this.owner.game.canvasSize.h;
 		var dist = Math.sqrt(Math.pow(xpct - this.x, 2) + Math.pow(ypct - this.y, 2));
-		if(dist < this.circleRadius)
+		if(dist < this.circleRadius) {
 			this.lit = true;
+			this.sound.play();
+		}
 	}
 };
 

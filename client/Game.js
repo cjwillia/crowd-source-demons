@@ -1,4 +1,4 @@
-function Game(canvas) {
+function Game(canvas, connection) {
 	this.canvas = canvas;
 	this.ctx = this.canvas.getContext('2d');
 	this.rituals = [];
@@ -19,6 +19,8 @@ function Game(canvas) {
 	addEventListener('resize', this.sizeCanvas.bind(this));
 
 	this.scheduleTick();
+
+	this.connection = connection;
 }
 
 Game.prototype.addRitual = function(ritual) {
@@ -36,11 +38,18 @@ Game.prototype.tick = function(dt, timestamp) {
 			throw new Error("Activating ritual didn't activate it?");
 
 		ritual.tick(dt);
-		if(ritual.isFulfilled())
-			this.rituals.shift().destroy();
+		if(ritual.isFulfilled()) {
+			var completed = this.rituals.shift();
+			this.sendRitualFulfilled(completed);
+			completed.destroy();
+		}
 	}
 
 	this.draw(dt);
+};
+
+Game.prototype.sendRitualFulfilled = function(ritual) {
+	this.connection.send(["ritualfulfilled", JSON.stringify(ritual.config)].join(':'));
 };
 
 Game.prototype.draw = function(dt) {
