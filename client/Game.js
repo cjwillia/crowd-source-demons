@@ -49,7 +49,14 @@ Game.prototype.tick = function(dt, timestamp) {
 };
 
 Game.prototype.sendRitualFulfilled = function(ritual) {
-	this.connection.send(["ritualfulfilled", JSON.stringify(ritual.config)].join(':'));
+	this.sendEvent("ritualfulfilled", ritual.config);
+};
+
+Game.prototype.sendEvent = function(type, body) {
+	if(body) 
+		this.connection.send([type, JSON.stringify(body)].join(':'));
+	else
+		this.connection.send(type);
 };
 
 Game.prototype.draw = function(dt) {
