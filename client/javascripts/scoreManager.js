@@ -41,7 +41,7 @@ function displayAttack(phase) {
 
 	setTimeout(function() {
 		document.body.removeChild(output);
-	}, 2000);
+	}, 3000);
 
 }
 

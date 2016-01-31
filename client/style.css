@@ -179,8 +179,8 @@ button.save {
 	font-size: 2rem;
 	color: white;
 	text-shadow: 0px 0px 20px black;
-	-webkit-animation: fade-up ease-out 2s 1;
-	animation: fade-up ease-out 2s 1;
+	-webkit-animation: fade-up ease-out 3s 1;
+	animation: fade-up ease-out 3s 1;
 	animation-fill-mode: both;
 }
 
