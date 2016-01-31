@@ -4,19 +4,16 @@ function PinRitual() {
 	this.touchBound = this.touch.bind(this);
 
 	this.offset = 1;
-	this.angle = this.config.angle;
+	this.angle = this.targetAngle = this.config.angle;
 
 	this.held = false;
-}
 
-PinRitual.prototype = Object.create(Ritual.prototype);
-
-PinRitual.prototype.activate = function() {
-	Ritual.prototype.activate.apply(this, arguments);
 	['touchstart', 'touchend', 'touchmove'].forEach(function(type) {
 		this.game.canvas.addEventListener(type, this.touchBound);
 	}, this);
-};
+}
+
+PinRitual.prototype = Object.create(Ritual.prototype);
 
 PinRitual.prototype.destroy = function() {
 	Ritual.prototype.destroy.apply(this, arguments);
@@ -53,7 +50,8 @@ PinRitual.prototype.draw = function(ctx, canvasSize) {
 		ctx.moveTo(actualOuterRadius + insertionDistance, 0);
 		ctx.lineTo(Math.max(innerRadius, actualOuterRadius - pinLength), 0);
 		ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-		ctx.stroke();
+		if(self.offset > 0)
+			ctx.stroke();
 		ctx.strokeStyle = 'black';
 		ctx.lineWidth = 2;
 		ctx.stroke();
@@ -61,12 +59,18 @@ PinRitual.prototype.draw = function(ctx, canvasSize) {
 		ctx.beginPath();
 		ctx.arc(actualOuterRadius + insertionDistance, 0, self.headRadius * canvasSize.min * 2, 0, 2 * Math.PI, false);
 		ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
-		ctx.fill();
+		if(self.offset > 0)
+			ctx.fill();
 		ctx.beginPath();
 		ctx.arc(actualOuterRadius + insertionDistance, 0, self.headRadius * canvasSize.min, 0, 2 * Math.PI, false);
 		ctx.fillStyle = 'black';
 		ctx.fill();
 	});
+};
+
+PinRitual.prototype.tick = function(ts) {
+	Ritual.prototype.tick.apply(this, arguments);
+	this.angle = (10 * this.angle + this.targetAngle)/11;
 };
 
 PinRitual.prototype.touch = function(e) {
@@ -94,9 +98,17 @@ PinRitual.prototype.touch = function(e) {
 
 	var isInRange = dist < this.tolerance * this.game.canvasSize.min;
 
-	if(e.type == 'touchstart' && isInRange)
+	if(e.type == 'touchstart' && isInRange && this.offset > 0)
 		this.held = true;
 
 	if(this.held)
 		this.offset = Math.max(Math.min(1, 2 * tx / this.game.canvasSize.min), 0);
+
+	if(this.offset == 0)
+		this.held = false;
 };
+
+PinRitual.prototype.reset = function() {
+	this.offset = 1;
+	this.targetAngle = Math.random() * 360;
+}

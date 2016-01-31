@@ -1,8 +1,10 @@
 function Game(canvas, connection) {
 	this.canvas = canvas;
 	this.ctx = this.canvas.getContext('2d');
-	this.rituals = [];
+	this.ritualConfig = {};
 	this.lastTick = 0;
+
+	this.ritualConfig = null;
 
 	if(!localStorage.getItem('axis'))
 		this.setup = new Setup(this);
@@ -21,31 +23,31 @@ function Game(canvas, connection) {
 	this.scheduleTick();
 
 	this.connection = connection;
+
+	this.dataBound = this.gotData.bind(this);
+	connection.addEventListener('message', this.dataBound);
+
+	this.join();
 }
 
 Game.prototype.join = function() {
-	this.sendEvent('joingame', {name: localStorage.get('name')});
+	this.sendEvent('joingame', {name: localStorage.getItem('name')});
 };
 
-Game.prototype.addRitual = function(ritual) {
-	this.rituals.push(ritual);
-	ritual.game = this;
-};
+Game.prototype.setRitualConfig = function(config) {
+	if(this.ritual)
+		this.ritual.destroy();
+	if(config)
+		this.ritual = new window[config.type](this, config);
+	this.ritualConfig = config;
+}
 
 Game.prototype.tick = function(dt, timestamp) {
-	var ritual = this.rituals[0];
-
-	if(!this.setup && ritual) {
-		if(!ritual.active)
-			ritual.activate();
-		if(!ritual.active)
-			throw new Error("Activating ritual didn't activate it?");
-
-		ritual.tick(dt);
-		if(ritual.isFulfilled()) {
-			var completed = this.rituals.shift();
-			this.sendRitualFulfilled(completed);
-			completed.destroy();
+	if(!this.setup && this.ritual) {
+		this.ritual.tick(dt);
+		if(this.ritual.isFulfilled()) {
+			this.sendRitualFulfilled(this.ritual);
+			this.ritual.reset();
 		}
 	}
 
@@ -72,8 +74,8 @@ Game.prototype.draw = function(dt) {
 	if(this.setup)
 		this.setup.draw(this.ctx, this.canvasSize);
 	else {
-		if(this.rituals[0])
-			this.rituals[0].draw(this.ctx, this.canvasSize);
+		if(this.ritual)
+			this.ritual.draw(this.ctx, this.canvasSize);
 	}
 
 	this.drawHUD(dt);
@@ -97,6 +99,22 @@ Game.prototype.scheduleTick = function() {
 
 		self.scheduleTick();
 	});
+};
+
+Game.prototype.gotData = function(e) {
+	var re = /(\w+):(.*)/;
+	var matches = e.data.match(re);
+	if(matches) {
+		var type = matches[1];
+		try { 
+			var body = JSON.parse(matches[2]);
+		}
+		catch (e) {
+			console.error("This isn't JSON: %s");
+		}
+	}
+	else
+		console.error("What is this I don't even: %s", e.data);
 };
 
 Game.prototype.sizeCanvas = function() {
