@@ -23,6 +23,10 @@ function Game(canvas, connection) {
 	this.connection = connection;
 }
 
+Game.prototype.join = function() {
+	this.sendEvent('joingame', {name: localStorage.get('name')});
+};
+
 Game.prototype.addRitual = function(ritual) {
 	this.rituals.push(ritual);
 	ritual.game = this;
