@@ -8,6 +8,7 @@ function letsGetThisPartyStarted() {
 	connection.addEventListener('open', function() {
 		var game = window.game = new Game(canvas, connection);
 
+		game.addRitual(new VoodooRitual(game, {count: 4}));
 		game.addRitual(new DemonChordRitual(game, {count: 5}));
 		game.addRitual(new TypingRitual(game, {incantation:'Skullz'}));
 		game.addRitual(new CandlesRitual(game, {count: 5}));
