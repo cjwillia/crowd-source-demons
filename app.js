@@ -83,7 +83,11 @@ socketEmitter.on('ritualfulfilled', function(data, ws) {
 });
 
 socketEmitter.on('createroom', function(data, ws) {
-    room = new RoomController(broadcast);
+	if(room)
+		return;
+
+    room = new RoomController(broadcast, SUMMONING_TIME);
+
     wss.clients.forEach(function(client) {
         client.send(serializeData('roomcreated', {}));
     });
@@ -123,7 +127,6 @@ wss.on('connection', function(ws) {
         } catch (e) {
 			console.error("Can't parse "+msg.data);
 			console.log(e);
-            ws.send("HEY DON'T FUCK WITH ME! ");
         }
     });
 
@@ -157,7 +160,11 @@ function makeSomeDemons() {
 function broadcast(subject, body, clients) {
 	clients = clients || wss.clients;
 	clients.forEach(function(client) {
-		client.send(serializeData(subject, body));
+		try {
+			client.send(serializeData(subject, body));
+		} catch (e) {
+			console.log("Failed to send message: "+e.message);
+		}
 	});
 };
 

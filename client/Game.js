@@ -36,6 +36,8 @@ Game.prototype.setRitualConfig = function(config) {
 		this.ritual.destroy();
 	if(config)
 		this.ritual = new window[config.type](this, config);
+	else
+		this.ritual = null;
 	this.ritualConfig = config;
 }
 
@@ -110,6 +112,12 @@ Game.prototype.gotData = function(e) {
 					break;
 				case "roomcreated":
 					alert("A room was created");
+					break;
+				case "tick":
+					var seconds = Math.round(body.time_remaining / 1000); 
+					if(!this.setup && seconds < 6) {
+						new CountdownNumber(seconds);
+					}
 					break;
 				case "teaminfo":
 					//I really don't care

@@ -1,8 +1,7 @@
-function DemonController(name, time) {
+function DemonController(name) {
     this.name = name;
     this.level = 0;
     this.rituals_observed = 0;
-    this.summoning_time = time;
 }
 
 DemonController.prototype.observeRitual = function(ritual) {
