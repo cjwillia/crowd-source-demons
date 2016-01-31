@@ -118,10 +118,14 @@ wss.on('connection', function(ws) {
     console.log('client is connected');
 
     ws.addEventListener('message', function(msg) {
-        var strs = msg.data.match(/(\w+):(.*)/);
-        var event_type = strs[1];
-        var data = JSON.parse(strs[2]);
-        socketEmitter.emit(event_type, data, ws);
+        try {
+            var strs = msg.data.match(/(\w+):(.*)/);
+            var event_type = strs[1];
+            var data = JSON.parse(strs[2]);
+            socketEmitter.emit(event_type, data, ws);
+        } catch (e) {
+            ws.send("HEY DON'T FUCK WITH ME");
+        }
     });
 
     ws.send(serializeData('ready', {}));
