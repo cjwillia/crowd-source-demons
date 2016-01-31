@@ -8,7 +8,7 @@ function BattleController(demon1, demon2, callback) {
 }
 
 BattleController.prototype.tick = function() {
-	var miss = Math.random() < 0.2;
+	var miss = Math.random() < 0.4;
 	var phase = {
 		attacker: this.demons[0],
 		defender: this.demons[1],
