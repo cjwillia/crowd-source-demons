@@ -11,6 +11,8 @@ function CandleRitual() {
 	this.sound = candleSound.cloneNode();
 
 	this.touchBound = this.touch.bind(this);
+
+	this.game.canvas.addEventListener('touchstart', this.touchBound);
 }
 
 CandleRitual.prototype = Object.create(Ritual.prototype);
@@ -20,11 +22,6 @@ CandleRitual.prototype.width = 0.04;
 CandleRitual.prototype.height = 0.1;
 CandleRitual.prototype.wickWidth = 0.01;
 CandleRitual.prototype.wickHeight = 0.02;
-
-CandleRitual.prototype.activate = function() {
-	Ritual.prototype.activate.apply(this, arguments);
-	this.game.canvas.addEventListener('touchstart', this.touchBound);
-};
 
 CandleRitual.prototype.isFulfilled = function() {
 	return this.lit;

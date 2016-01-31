@@ -12,7 +12,7 @@ MetaRitual.prototype.isFulfilled = function() {
 	return true;
 };
 
-MetaRitual.prototype.activate = function() {
+MetaRitual.prototype.destroy = function() {
 	Ritual.prototype.destroy.apply(this, arguments);
 
 	this.subrituals.forEach(function(sr) {
@@ -20,15 +20,18 @@ MetaRitual.prototype.activate = function() {
 	});
 };
 
+MetaRitual.prototype.tick = function() {
+	for(var i = 0; i < this.subrituals.length; i++)
+		this.subrituals[i].tick.apply(this.subrituals[i], arguments);
+};
+
 MetaRitual.prototype.draw = function() {
 	for(var i = 0; i < this.subrituals.length; i++)
 		this.subrituals[i].draw.apply(this.subrituals[i], arguments);
 };
 
-MetaRitual.prototype.activate = function() {
-	Ritual.prototype.activate.apply(this, arguments);
-
+MetaRitual.prototype.reset = function() {
 	this.subrituals.forEach(function(sr) {
-		sr.activate.apply(sr, arguments);
+		sr.reset.apply(sr, arguments);
 	});
 };

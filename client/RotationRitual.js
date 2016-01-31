@@ -3,7 +3,7 @@ rotationSound.src = 'sounds/white-noise.ogg';
 
 function RotationRitual(game, config) {
 	Ritual.apply(this, arguments);
-	this.targetAngle = config.targetAngle;
+	this.targetAngle = Math.random() * 100 - 50;
 	this.actualAngle = 0;
 
 	this.orientedBound = this.oriented.bind(this);
@@ -13,23 +13,17 @@ function RotationRitual(game, config) {
 	this.heldSeconds = 0;
 
 	this.sound = rotationSound.cloneNode();
+
+	addEventListener('deviceorientation', this.orientedBound);
 }
 
 RotationRitual.prototype = Object.create(Ritual.prototype);
-
-RotationRitual.prototype.activate = function() {
-	Ritual.prototype.activate.apply(this, arguments);
-	addEventListener('deviceorientation', this.orientedBound);
-};
 
 RotationRitual.prototype.tolerance = 2.5;
 RotationRitual.prototype.targetSeconds = 1;
 
 RotationRitual.prototype.tick = function(dt) {
 	Ritual.prototype.tick.apply(this, arguments);
-
-	if(!this.active)
-		return;
 
 	if(Math.abs(this.targetAngle - this.actualAngle) < this.tolerance) {
 		if(this.heldSeconds == 0)
@@ -43,6 +37,10 @@ RotationRitual.prototype.tick = function(dt) {
 			this.sound.currentTime = 0;
 		}
 	}
+};
+
+RotationRitual.prototype.reset = function() {
+	this.targetAngle = Math.random() * 100 - 50;
 };
 
 RotationRitual.prototype.isFulfilled = function() {

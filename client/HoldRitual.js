@@ -9,22 +9,26 @@ for(var i = 0; i < 5; i++) {
 
 function HoldRitual(game, config) {
 	Ritual.apply(this, arguments);
-	this.x = config.x;
-	this.y = config.y;
 	this.held = false;
+	this.x = Math.random();
+	this.y = Math.random();
 
 	this.sound = notes[config.soundIndex];
 
-	this.touchBound = this.touch.bind(this)
+	this.touchBound = this.touch.bind(this);
+
+	['touchstart', 'touchend', 'touchmove'].forEach(function(e) {
+		this.game.canvas.addEventListener(e, this.touchBound);
+	}, this);
 }
 
 HoldRitual.prototype = Object.create(Ritual.prototype);
 
-HoldRitual.prototype.activate = function() {
-	Ritual.prototype.activate.apply(this, arguments);
-	['touchstart', 'touchend', 'touchmove'].forEach(function(e) {
-		this.game.canvas.addEventListener(e, this.touchBound);
-	}, this);
+HoldRitual.prototype.reset = function() {
+	Ritual.prototype.reset.apply(this, arguments);
+	this.held = false;
+	this.x = Math.random();
+	this.y = Math.random();
 };
 
 HoldRitual.prototype.destroy = function() {
