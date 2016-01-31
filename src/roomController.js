@@ -1,35 +1,77 @@
+const BattleController = require('./battleController.js');
 var rituals = [
-	{type: 'RotationRitual', value: 1},
-	{type: 'VoodooRitual', count: 4, value: 1},
-	{type: 'DemonChordRitual', count: 4, value: 1},
-	{type: 'TypingRitual', value: 1},
+	{type: 'RotationRitual', value: 3},
+	{type: 'VoodooRitual', count: 4, value: 3},
+	{type: 'DemonChordRitual', count: 4, value: 5},
+	{type: 'TypingRitual', value: 8},
 	{type: 'CandlesRitual', count: 5, value: 1}
 ];
 
-function RoomController(broadcast) {
+function RoomController(broadcast, gameDuration) {
 	this.broadcast = broadcast;
-    this.summoner_count = 0;
+	this.time_remaining = gameDuration;
 	this.current_ritual = null;
     this.teams = {
         left: {
             summoners: [],
-            demons: []
+            demon: null
         },
         right: {
             summoners: [],
-            demons: []
+            demon: null
         }
     };
-    this.started = false;
+    this.playing = false;
+	this.battleController = false;
+}
+
+RoomController.prototype.tick = function() {
+	var now = new Date();
+
+	if(this.battleController) {
+		console.log("Ticking battle controller");
+		this.battleController.tick();
+		if(this.teams.left.demon.health && this.teams.right.demon.health)
+			setTimeout(this.tick.bind(this), 3000);
+		else
+			console.log("Some demon died :(");
+	}
+	else {
+		if(this.playing && this.last_tick) {
+			this.time_remaining = Math.max(0, this.time_remaining - (now - this.last_tick));
+			this.broadcast('tick', {time_remaining: this.time_remaining});
+			if(!this.time_remaining) {
+				this.stopGame();
+				this.battleController = new BattleController(this.teams.left.demon, this.teams.right.demon, this.attackHappened.bind(this));
+				setTimeout(this.tick.bind(this), 3000);
+			}
+		}
+
+		if(this.playing)
+			setTimeout(this.tick.bind(this), 1000);
+
+	}
+
+	console.log(this.time_remaining);
+
+	this.last_tick = now;
+};
+
+RoomController.prototype.attackHappened = function(phase) {
+	console.log(phase);
+	this.broadcast('attack', phase);
+	if(!phase.miss)
+		this.broadcast('teaminfo', this.teams);
 }
 
 RoomController.prototype.ritualInterval = 20000;
 
 RoomController.prototype.addSummoner = function(summoner) {
-    pickATeamAndAdd(summoner, this);
-    this.summoner_count += 1;
+	pickATeamAndAdd(summoner, this);
 	this.broadcast('newritual', this.current_ritual, [summoner.socket]);
-	console.log("Summoners: "+this.summoner_count);
+	this.broadcast('teaminfo', this.teams);
+	this.broadcast('joined', {}, [summoner.socket]);
+	console.log("Summoners: "+this.getAllSummoners().length);
 };
 
 function pickATeamAndAdd(summoner, that) {
@@ -40,62 +82,53 @@ function pickATeamAndAdd(summoner, that) {
 }
 
 RoomController.prototype.removeSummoner = function(summoner) {
-    this.summoner_count -= findAndRemoveSummoner(summoner, this);
+    findAndRemoveSummoner(summoner, this);
 };
 
 function findAndRemoveSummoner(summoner, that) {
-    var res = 0;
     var leftTeamIndex = that.teams.left.summoners.indexOf(summoner);
     var rightTeamIndex = that.teams.right.summoners.indexOf(summoner);
 
-    if(leftTeamIndex !== -1) {
+    if(leftTeamIndex !== -1)
         that.teams.left.summoners.splice(leftTeamIndex, 0);
-        res++;
-    }
-    if(rightTeamIndex !== -1) {
+
+    if(rightTeamIndex !== -1)
         that.teams.right.summoners.splice(rightTeamIndex, 0);
-        res++;
-    }
-
-    return res;
 }
-
-RoomController.prototype.addDemon = function(demon, team) {
-    var receiving_team;
-    switch(team) {
-        case "left":
-            receiving_team = this.teams.left;
-            break;
-        case "right":
-            receiving_team = this.teams.right;
-            break;
-    }
-
-    receiving_team.demons.push(demon);
-};
 
 RoomController.prototype.getAllSummoners = function() {
     return this.teams.left.summoners.concat(this.teams.right.summoners);
 };
 
+RoomController.prototype.getAllSockets = function() {
+	return this.getAllSummoners().map(function(s) {return s.socket;});
+}
+
 RoomController.prototype.readyToStart = function() {
+	return true;
     return this.teams.left.summoners.length && this.teams.right.summoners.length;
 };
 
 RoomController.prototype.startGame = function(demons) {
-    this.teams.left.demons.push(demons.pop());
-    this.teams.right.demons.push(demons.pop());
-    this.started = true;
+	if(this.playing)
+		return;
+
+    this.teams.left.demon = demons.pop();
+    this.teams.right.demon = demons.pop();
+    this.playing = true;
 	this.pickRitual();
+	this.broadcast('gamestarted',{num_players: this.getAllSummoners().length});
+	this.last_tick = null;
+	this.tick();
 };
 
 RoomController.prototype.stopGame = function() {
-	this.started = false;
+	this.playing = false;
 	this.setRitual(null);
 }
 
 RoomController.prototype.pickRitual = function() {
-	if(this.started) {
+	if(this.playing) {
 		var i = Math.floor(Math.random() * rituals.length);
 		this.setRitual(rituals[i]);
 		setTimeout(this.pickRitual.bind(this), this.ritualInterval)
@@ -104,7 +137,7 @@ RoomController.prototype.pickRitual = function() {
 
 RoomController.prototype.setRitual = function(r) {
 	this.current_ritual = r;
-	this.broadcast('newritual', this.current_ritual);
+	this.broadcast('newritual', this.current_ritual, this.getAllSockets());
 };
 
 RoomController.prototype.ritualObserved = function(ritual, ws) {
@@ -112,7 +145,7 @@ RoomController.prototype.ritualObserved = function(ritual, ws) {
 		team.summoners.forEach(function(summoner) {
 			if(summoner.socket == ws) {
 				summoner.score += ritual.value;
-				team.demons[0].observeRitual(ritual);
+				team.demon.observeRitual(ritual);
 				this.broadcast('teaminfo', this.teams);
 				console.log(JSON.stringify(this.teams, null, 2));
 			}

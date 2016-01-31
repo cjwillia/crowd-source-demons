@@ -83,7 +83,11 @@ socketEmitter.on('ritualfulfilled', function(data, ws) {
 });
 
 socketEmitter.on('createroom', function(data, ws) {
-    room = new RoomController(broadcast);
+	if(room)
+		return;
+
+    room = new RoomController(broadcast, SUMMONING_TIME);
+
     wss.clients.forEach(function(client) {
         client.send(serializeData('roomcreated', {}));
     });
@@ -103,9 +107,6 @@ socketEmitter.on('startsummoning', function(data, ws) {
     if(room.readyToStart()) {
         var demons = makeSomeDemons();
         room.startGame(demons);
-        wss.clients.forEach(function(client) {
-            client.send(serializeData('gamestarted', {num_players: room.getAllSummoners.length}));
-        });
     }
     else {
         ws.send(serializeData('notready', {}));
@@ -124,8 +125,8 @@ wss.on('connection', function(ws) {
             var data = JSON.parse(strs[2]);
             socketEmitter.emit(event_type, data, ws);
         } catch (e) {
-			console.error("Can't parse "+msg.data+": "+e.message);
-            ws.send("HEY DON'T FUCK WITH ME! ");
+			console.error("Can't parse "+msg.data);
+			console.log(e);
         }
     });
 
@@ -159,7 +160,11 @@ function makeSomeDemons() {
 function broadcast(subject, body, clients) {
 	clients = clients || wss.clients;
 	clients.forEach(function(client) {
-		client.send(serializeData(subject, body));
+		try {
+			client.send(serializeData(subject, body));
+		} catch (e) {
+			console.log("Failed to send message: "+e.message);
+		}
 	});
 };
 

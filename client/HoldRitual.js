@@ -1,10 +1,14 @@
 var notes = [];
+var runes = [];
 for(var i = 0; i < 5; i++) {
 	var note = document.createElement('audio');
 	note.src = ['sounds/note',i + 1,'.ogg'].join('');
 	note.loop = true;
 	notes[i] = note;
-	this.showing = false;
+
+	var rune = document.createElement('img');
+	rune.src = ['images/rune',i+1,'.png'].join('');
+	runes[i] = rune;
 }
 
 function HoldRitual(game, config) {
@@ -13,7 +17,10 @@ function HoldRitual(game, config) {
 	this.x = Math.random();
 	this.y = Math.random();
 
+	this.showing = false;
+
 	this.sound = notes[config.soundIndex];
+	this.image = runes[config.soundIndex];
 
 	this.touchBound = this.touch.bind(this);
 
@@ -76,7 +83,13 @@ HoldRitual.prototype.draw = function(ctx, canvasSize) {
 	ctx.sr(function() {	
 		ctx.beginPath();
 		ctx.fillStyle = self.held ? 'white' : 'black';
-		ctx.arc(self.x * canvasSize.w, self.y * canvasSize.h, radPix, 0, 2 * Math.PI, false);
+		var x = self.x * canvasSize.w;
+		var y = self.y * canvasSize.h;
+
+		ctx.arc(x, y, radPix, 0, 2 * Math.PI, false);
 		ctx.fill();
+
+		if(self.image.width)
+			ctx.drawImage(self.image, x - self.image.width / 2, y - self.image.height / 2);
 	});
 };

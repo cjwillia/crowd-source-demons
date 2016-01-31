@@ -6,8 +6,7 @@ function Game(canvas, connection) {
 
 	this.ritualConfig = null;
 
-	if(!localStorage.getItem('axis'))
-		this.setup = new Setup(this);
+	this.setup = new Setup(this);
 
 	this.canvasSize = {
 		w: 0,
@@ -26,8 +25,6 @@ function Game(canvas, connection) {
 
 	this.dataBound = this.gotData.bind(this);
 	connection.addEventListener('message', this.dataBound);
-
-	this.join();
 }
 
 Game.prototype.join = function() {
@@ -39,6 +36,8 @@ Game.prototype.setRitualConfig = function(config) {
 		this.ritual.destroy();
 	if(config)
 		this.ritual = new window[config.type](this, config);
+	else
+		this.ritual = null;
 	this.ritualConfig = config;
 }
 
@@ -71,12 +70,8 @@ Game.prototype.draw = function(dt) {
 	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 	this.ctx.fillStyle = 'black';
 
-	if(this.setup)
-		this.setup.draw(this.ctx, this.canvasSize);
-	else {
-		if(this.ritual)
-			this.ritual.draw(this.ctx, this.canvasSize);
-	}
+	if(!this.setup && this.ritual)
+		this.ritual.draw(this.ctx, this.canvasSize);
 
 	this.drawHUD(dt);
 };
@@ -113,7 +108,25 @@ Game.prototype.gotData = function(e) {
 					this.setRitualConfig(body);
 					break;
 				case "noroom":
-					alert("No room. Reload this page later.");
+					alert("There is no room to join.");
+					break;
+				case "roomcreated":
+					alert("A room was created");
+					break;
+				case "tick":
+					var seconds = Math.round(body.time_remaining / 1000); 
+					if(!this.setup && seconds < 6) {
+						new CountdownNumber(seconds);
+					}
+					break;
+				case "teaminfo":
+					//I really don't care
+					break;
+				case "joined":
+					if(this.setup) {
+						this.setup.destroy();
+						this.setup = false;
+					}
 					break;
 				default:
 					console.error("%s? %s?! What do I do with this?", type, type);
