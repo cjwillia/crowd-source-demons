@@ -1,3 +1,4 @@
+var body = d3.select("body");
 var socket = new WebSocket("ws://"+window.location.host);
 
 socket.addEventListener('message', function(event) {
@@ -8,7 +9,7 @@ socket.addEventListener('message', function(event) {
         try {
             var body = JSON.parse(matches[2]);
             switch (type) {
-                case "gameinfo":
+                case "teaminfo":
                     loadPlayerInfo(body);
                     break;
             }
@@ -18,7 +19,6 @@ socket.addEventListener('message', function(event) {
     }
 });
 
-var body = d3.select("body");
 
 function sortList(listId) {
     body.select(listId).selectAll("li").sort(scoreCompare).transition().style({
