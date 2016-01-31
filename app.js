@@ -13,6 +13,25 @@ const EventEmitter = require('events');
 const util = require('util');
 const SUMMONING_TIME = 1000 * 60 * 3;
 
+const DEMON_NAMES = [
+	'Yrrej Putuhs', 
+	'The Finalizer', 
+	'Lord Umbra', 
+	'Infinite Nightmare', 
+	'Nyarlathotep', 
+	'Morgal', 
+	'Bael', 
+	'Hell-vetica', 
+	'Nyx', 
+	'Faselidic', 
+	'Rahab', 
+	'Akuma Meshia', 
+	'Beelzebub', 
+	'Mr.Bad Guy', 
+	'S.T.E.V.E.', 
+	'Avarice Phantom' 
+];
+
 function SocketEmitter() {
     EventEmitter.call(this);
 }
@@ -152,9 +171,14 @@ function serializeData(event_type, data) {
 }
 
 function makeSomeDemons() {
-    var d1 = new DemonController("ima demon :(", SUMMONING_TIME);
-    var d2 = new DemonController("me2 wtf :(((", SUMMONING_TIME);
+    var d1 = new DemonController(pickName(), SUMMONING_TIME);
+    var d2 = new DemonController(pickName(), SUMMONING_TIME);
     return [d1, d2];
+}
+
+function pickName() {
+	var i = Math.floor(Math.random() * DEMON_NAMES.length)
+	return DEMON_NAMES[i];
 }
 
 function broadcast(subject, body, clients) {
