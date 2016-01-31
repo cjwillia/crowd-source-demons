@@ -54,31 +54,7 @@ CandleRitual.prototype.draw = function(ctx, canvasSize) {
 	var widthPix = this.width * canvasSize.min;
 	var heightPix = this.height * canvasSize.min;
 
-	var self = this;
-
-	ctx.sr(function() {	
-
-		//body
-		ctx.beginPath();
-		ctx.fillStyle = '#F88';
-		ctx.fillRect(self.x * canvasSize.w - widthPix/2, self.y * canvasSize.h, widthPix, heightPix);
-		ctx.fill();
-
-		//wick
-		ctx.beginPath();
-		ctx.fillStyle = '#787878';
-		ctx.fillRect(self.x * canvasSize.w - self.wickWidth * canvasSize.min / 2,
-			self.y * canvasSize.h - self.wickHeight * canvasSize.min,
-			self.wickWidth * canvasSize.min, self.wickHeight * canvasSize.min);
-		ctx.fill();
-
-		if(self.lit) {
-			ctx.beginPath();
-			ctx.fillStyle = 'white';
-			ctx.arc(self.x * canvasSize.w, self.y * canvasSize.h, radPix, 0, 2 * Math.PI, false);
-			ctx.fill();
-		}
-	});
+	ctx.drawImage(this.lit ? litImage : unlitImage, this.x * canvasSize.w - 19, this.y * canvasSize.h - 6);
 };
 
 CandleRitual.prototype.reset = function() {
