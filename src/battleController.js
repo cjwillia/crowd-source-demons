@@ -23,6 +23,8 @@ BattleController.prototype.tick = function() {
 	}
 
 	this.callback(phase);
+
+	this.swap();
 };
 
 BattleController.prototype.swap = function() {
