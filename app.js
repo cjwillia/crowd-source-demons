@@ -11,7 +11,7 @@ var wss = new WebSocketServer({server: http});
 
 const EventEmitter = require('events');
 const util = require('util');
-const SUMMONING_TIME = 1000 * 60 * 3;
+const SUMMONING_TIME = 1000 * 10; //1000 * 60 * 3;
 
 function SocketEmitter() {
     EventEmitter.call(this);

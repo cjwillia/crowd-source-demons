@@ -12,6 +12,11 @@ socket.addEventListener('message', function(event) {
                 case "teaminfo":
                     loadPlayerInfo(body);
                     break;
+				case "attack":
+					displayAttack(body);
+					break;
+				default:
+					console.log("I don't know what to do with "+type);
             }
         } catch (e) {
             console.log('error reading ' + type);
@@ -19,6 +24,26 @@ socket.addEventListener('message', function(event) {
     }
 });
 
+function displayAttack(phase) {
+	var output = document.createElement('div');
+	output.className = 'attack-display';
+
+	var title = document.createElement('div');
+	title.textContent = [phase.attacker.name, 'attacks', phase.defender.name].join(' ');
+	output.appendChild(title);
+
+	var damage = document.createElement('div');
+	damage.textContent = phase.miss ? 'Miss!' : [phase.damage, 'dmg'].join(' ');
+	output.appendChild(damage);
+
+
+	document.body.appendChild(output);
+
+	setTimeout(function() {
+		document.body.removeChild(output);
+	}, 2000);
+
+}
 
 function sortList(listId) {
     body.select(listId).selectAll("li").sort(scoreCompare).transition().style({
@@ -54,4 +79,10 @@ function loadPlayerInfo(gameinfo) {
 
     updateData("#leftTeamList", leftData);
     updateData("#rightTeamList", rightData);
+}
+
+var dis = document.querySelectorAll('.demon-image');
+for(var i = 0; i < dis.length; i++) {
+	var imageIndex = Math.floor(Math.random() * 13);
+	dis[i].style.backgroundImage = 'url(images/demons/'+imageIndex+'.png)'
 }
