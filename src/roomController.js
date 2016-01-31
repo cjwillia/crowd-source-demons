@@ -1,8 +1,9 @@
+const BattleController = require('./battleController.js');
 var rituals = [
-	{type: 'RotationRitual', value: 1},
-	{type: 'VoodooRitual', count: 4, value: 1},
-	{type: 'DemonChordRitual', count: 4, value: 1},
-	{type: 'TypingRitual', value: 1},
+	{type: 'RotationRitual', value: 3},
+	{type: 'VoodooRitual', count: 4, value: 3},
+	{type: 'DemonChordRitual', count: 4, value: 5},
+	{type: 'TypingRitual', value: 8},
 	{type: 'CandlesRitual', count: 5, value: 1}
 ];
 
@@ -21,25 +22,47 @@ function RoomController(broadcast, gameDuration) {
         }
     };
     this.playing = false;
+	this.battleController = false;
 }
 
 RoomController.prototype.tick = function() {
 	var now = new Date();
 
-	if(this.playing && this.last_tick) {
-		this.time_remaining = Math.max(0, this.time_remaining - (now - this.last_tick));
-		this.broadcast('tick', {time_remaining: this.time_remaining});
-		if(!this.time_remaining) {
-			this.stopGame();
-			//TODO: awesome demon battle
+	if(this.battleController) {
+		console.log("Ticking battle controller");
+		this.battleController.tick();
+		if(this.teams.left.demon.health && this.teams.right.demon.health)
+			setTimeout(this.tick.bind(this), 3000);
+		else
+			console.log("Some demon died :(");
+	}
+	else {
+		if(this.playing && this.last_tick) {
+			this.time_remaining = Math.max(0, this.time_remaining - (now - this.last_tick));
+			this.broadcast('tick', {time_remaining: this.time_remaining});
+			if(!this.time_remaining) {
+				this.stopGame();
+				this.battleController = new BattleController(this.teams.left.demon, this.teams.right.demon, this.attackHappened.bind(this));
+				setTimeout(this.tick.bind(this), 3000);
+			}
 		}
+
+		if(this.playing)
+			setTimeout(this.tick.bind(this), 1000);
+
 	}
 
-	if(this.playing)
-		setTimeout(this.tick.bind(this), 1000);
+	console.log(this.time_remaining);
 
 	this.last_tick = now;
 };
+
+RoomController.prototype.attackHappened = function(phase) {
+	console.log(phase);
+	this.broadcast('attack', phase);
+	if(!phase.miss)
+		this.broadcast('teaminfo', this.teams);
+}
 
 RoomController.prototype.ritualInterval = 20000;
 
