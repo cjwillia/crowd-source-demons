@@ -11,6 +11,7 @@ socket.addEventListener('message', function(event) {
             switch (type) {
                 case "teaminfo":
                     loadPlayerInfo(body);
+                    loadDemonInfo(body);
                     break;
             }
         } catch (e) {
@@ -48,10 +49,45 @@ function formatPlayerInfo (d) {
     return "<span class='name'>"+d.name+"</span>" + "<span class='score'>"+d.score+"</span>";
 }
 
+function updateDemonInfo(demonElem, demon) {
+    var parent = body.select(demonElem);
+
+    var demonExpInfo = {
+        current: demon.score,
+        next: demon.nextLevel
+    };
+
+    var dExp = formatDemonExp(demonExpInfo);
+
+    parent.select(demonElem+"Name").html(demon.name + " - Lvl " + demon.level);
+    parent.select(demonElem+"Exp").html(dExp);
+    parent.select(demonElem+"Health").html(demon.health);
+}
+
+function formatDemonName(d) {
+    return d.name;
+}
+
+function formatDemonExp(d) {
+    return d.current + " / " + d.next;
+}
+
+function formatDemonHealth(d) {
+    return d.health;
+}
+
 function loadPlayerInfo(gameinfo) {
     var leftData = gameinfo.left.summoners;
     var rightData = gameinfo.right.summoners;
 
     updateData("#leftTeamList", leftData);
     updateData("#rightTeamList", rightData);
+}
+
+function loadDemonInfo(gameinfo) {
+    var leftDemon = gameinfo.left.demon;
+    var rightDemon = gameinfo.right.demon;
+
+    updateDemonInfo("#leftDemon", leftDemon);
+    updateDemonInfo("#rightDemon", rightDemon);
 }
