@@ -1,3 +1,6 @@
+var summoningCircle = document.createElement('img');
+summoningCircle.src = 'images/summoning-circle.png';
+
 var rotationSound = document.createElement('audio');
 rotationSound.src = 'sounds/white-noise.ogg';
 
@@ -58,7 +61,12 @@ RotationRitual.prototype.oriented = function(e) {
 RotationRitual.prototype.draw = function(ctx, canvasSize) {
 	var self = this;
 
-	var r = canvasSize.min * 0.4;
+	if(!summoningCircle.width)
+		return;
+
+	var r = canvasSize.min * 0.8;
+	var imageSize = summoningCircle.width;
+	var scale = r / imageSize;
 
 	var shakeMagnitude = canvasSize.min * 0.01 * this.heldSeconds / this.targetSeconds;
 	var shakeAngle = Math.random() * 2 * Math.PI;
@@ -66,41 +74,14 @@ RotationRitual.prototype.draw = function(ctx, canvasSize) {
 	var shakeY = Math.sin(shakeAngle) * shakeMagnitude;
 
 	ctx.sr(function() {
-		ctx.beginPath();
-
-		ctx.lineWidth = 2;
-
 		ctx.translate(canvasSize.w / 2, canvasSize.h / 2);
-		ctx.arc(shakeX, shakeY, r, 0, 2 * Math.PI, false);
-		ctx.stroke();
-
-		shakeAngle = Math.random() * 2 * Math.PI;
-		shakeX = Math.cos(shakeAngle) * shakeMagnitude;
-		shakeY = Math.sin(shakeAngle) * shakeMagnitude;
-
-		ctx.beginPath();
-		for(var i = 0; i < 6; i++) {
-			var angle = (4 * i + 0.5) * Math.PI/5 - (self.targetAngle / 180 * Math.PI);
-			var x = Math.cos(angle) * r;
-			var y = Math.sin(angle) * r;
-			ctx.lineTo(x + shakeX, y + shakeY);
-		}
-		ctx.stroke();
-
-		shakeAngle = Math.random() * 2 * Math.PI;
-		shakeX = Math.cos(shakeAngle) * shakeMagnitude;
-		shakeY = Math.sin(shakeAngle) * shakeMagnitude;
-
-		ctx.beginPath();
-		ctx.strokeStyle = '#800';
-		for(var i = 0; i < 6; i++) {
-			var angle = (4 * i + 0.5) * Math.PI/5 - (self.actualAngle / 180 * Math.PI);
-			var x = Math.cos(angle) * r;
-			var y = Math.sin(angle) * r;
-			ctx.lineTo(x + shakeX, y + shakeY);
-		}
-		ctx.stroke();
+		ctx.rotate(self.targetAngle / 180 * Math.PI);
+		ctx.drawImage(summoningCircle, shakeX - imageSize * scale * 0.5, shakeY - imageSize * scale * 0.5, imageSize * scale, imageSize * scale);
+		ctx.rotate(-self.targetAngle / 180 * Math.PI);
+		ctx.rotate(self.actualAngle / 180 * Math.PI);
+		ctx.drawImage(summoningCircle, shakeX - imageSize * scale * 0.5, shakeY - imageSize * scale * 0.5, imageSize * scale, imageSize * scale);
 	});
+
 };
 
 RotationRitual.prototype.destroy = function() {
