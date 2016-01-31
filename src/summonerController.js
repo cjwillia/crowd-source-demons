@@ -4,4 +4,11 @@ function SummonerController(name, socket) {
     this.socket = socket;
 }
 
+SummonerController.prototype.toJSON = function() {
+	return {
+		name: this.name,
+		score: this.score
+	};
+}
+
 module.exports = SummonerController;

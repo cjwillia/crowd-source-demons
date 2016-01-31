@@ -79,11 +79,11 @@ app.use(function(err, req, res, next) {
 // websocket nonsense etc
 
 socketEmitter.on('ritualfulfilled', function(data, ws) {
-    console.log(data);
+	room.ritualObserved(data, ws);
 });
 
 socketEmitter.on('createroom', function(data, ws) {
-    room = new RoomController();
+    room = new RoomController(broadcast);
     wss.clients.forEach(function(client) {
         client.send(serializeData('roomcreated', {}));
     });
@@ -124,7 +124,8 @@ wss.on('connection', function(ws) {
             var data = JSON.parse(strs[2]);
             socketEmitter.emit(event_type, data, ws);
         } catch (e) {
-            ws.send("HEY DON'T FUCK WITH ME");
+			console.error("Can't parse "+msg.data+": "+e.message);
+            ws.send("HEY DON'T FUCK WITH ME! ");
         }
     });
 
@@ -154,5 +155,12 @@ function makeSomeDemons() {
     var d2 = new DemonController("me2 wtf :(((", SUMMONING_TIME);
     return [d1, d2];
 }
+
+function broadcast(subject, body, clients) {
+	clients = clients || wss.clients;
+	clients.forEach(function(client) {
+		client.send(serializeData(subject, body));
+	});
+};
 
 module.exports = app;

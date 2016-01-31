@@ -29,7 +29,7 @@ PinRitual.prototype.isFulfilled = function() {
 PinRitual.prototype.headRadius = 0.01;
 PinRitual.prototype.outerRadius = 0.8;
 PinRitual.prototype.innerRadius = 0.08;
-PinRitual.prototype.tolerance = 0.03;
+PinRitual.prototype.tolerance = 0.05;
 
 PinRitual.prototype.draw = function(ctx, canvasSize) {
 	var innerRadius = canvasSize.min * this.innerRadius / 2;

@@ -108,9 +108,19 @@ Game.prototype.gotData = function(e) {
 		var type = matches[1];
 		try { 
 			var body = JSON.parse(matches[2]);
+			switch(type) {
+				case "newritual":
+					this.setRitualConfig(body);
+					break;
+				case "noroom":
+					alert("No room. Reload this page later.");
+					break;
+				default:
+					console.error("%s? %s?! What do I do with this?", type, type);
+			}
 		}
 		catch (e) {
-			console.error("This isn't JSON: %s");
+			console.error(e.message);
 		}
 	}
 	else
