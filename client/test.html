@@ -5,7 +5,7 @@
 <p id="lmaooo"></p>
 <p id="lmfaoo"></p>
 <script type="text/javascript">
-    var testSocket = new WebSocket("ws://localhost:5050");
+	var testSocket = new WebSocket("ws://"+window.location.host);
 
     testSocket.addEventListener('open', function(event) {
         console.log('connection open');
