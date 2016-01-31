@@ -23,7 +23,7 @@ function RoomController(broadcast) {
     this.started = false;
 }
 
-RoomController.prototype.ritualInterval = 10000;
+RoomController.prototype.ritualInterval = 20000;
 
 RoomController.prototype.addSummoner = function(summoner) {
     pickATeamAndAdd(summoner, this);
