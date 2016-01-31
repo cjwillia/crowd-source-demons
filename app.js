@@ -45,6 +45,14 @@ app.get('/', function(req, res, next) {
     res.sendFile(__dirname + '/client/index.html');
 });
 
+app.get('/client', function(req, res, next) {
+    // not implemented
+});
+
+app.get('/host', function(req, res, next) {
+    res.sendFile(__dirname + '/client/host.html');
+});
+
 app.get('/test', function(req, res, next) {
     res.sendFile(__dirname + '/client/test.html');
 });
@@ -83,7 +91,7 @@ socketEmitter.on('createroom', function(data, ws) {
 
 socketEmitter.on('joingame', function(data, ws) {
     if(room) {
-        var summoner = new SummonerController(name, ws);
+        var summoner = new SummonerController(data.name, ws);
         room.addSummoner(summoner);
     }
     else {
@@ -116,7 +124,7 @@ wss.on('connection', function(ws) {
         socketEmitter.emit(event_type, data, ws);
     });
 
-    ws.send('ready');
+    ws.send(serializeData('ready', {}));
 });
 
 // server initialization
