@@ -59,7 +59,7 @@ HoldRitual.prototype.touch = function(e) {
 		this.sound.pause();
 };
 
-HoldRitual.prototype.circleRadius = 0.075;
+HoldRitual.prototype.circleRadius = 0.095;
 
 HoldRitual.prototype.isFulfilled = function() {
 	return this.held;
