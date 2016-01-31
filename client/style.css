@@ -8,6 +8,18 @@ body, html {
 	background-color: #F44;
 }
 
+li {
+	list-style-type: none;
+	border: solid 1px;
+	border-radius: 3px;
+	border-color: #999;
+	background-color: #ccc;
+}
+
+h3 {
+	margin-top: 10px;
+}
+
 label {
 	position: absolute;
 	left: 0;
@@ -64,4 +76,74 @@ button.save {
 @keyframes fade-out {
 	0% { opacity: 1; transform: scale(1); }
 	100% { opacity: 0; transform: scale(0); }
+}
+
+#team1list .score {
+	float: right;
+}
+
+#team1list .name {
+	float: left;
+}
+
+#team2list .score {
+	float: left;
+}
+
+#team2list .name {
+	float: right;
+}
+
+.teamColumn {
+	width: 320px;
+	border-left: solid 2px;
+	border-right: solid 2px;
+	height: 100%;
+}
+
+.mainColumn {
+	flex: 1 1 auto;
+}
+
+.columnParent {
+	display: flex;
+	flex-direction: row;
+}
+
+.teamBody ul li {
+	height: 40px;
+	position: fixed;
+	width: 260px;
+}
+
+.mainColumnRows {
+	display: flex;
+	flex-direction: column;
+}
+
+.displayRow {
+	height: 75%;
+	border-bottom: solid 2px;
+}
+
+.demonInfoRow {
+	height: 25%;
+}
+
+.demonInfoColumns {
+	display: flex;
+	flex-direction: row;
+}
+
+.demonInfo {
+	height: 100%;
+	width: 50%;
+}
+
+#team1Demon {
+	border-right: solid 2px;
+}
+
+#team2Demon {
+	border-left: solid 2px;
 }
