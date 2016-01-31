@@ -14,7 +14,7 @@ DemonController.prototype.getStrength = function() {
 DemonController.prototype.observeRitual = function(ritual) {
 	this.rituals_observed += 1;
 	this.score += ritual.value;
-	while(this.score > this.nextLevel)
+	while(this.score >= this.nextLevel)
 		this.levelUp();
 };
 
