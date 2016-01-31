@@ -103,9 +103,6 @@ socketEmitter.on('startsummoning', function(data, ws) {
     if(room.readyToStart()) {
         var demons = makeSomeDemons();
         room.startGame(demons);
-        wss.clients.forEach(function(client) {
-            client.send(serializeData('gamestarted', {num_players: room.getAllSummoners.length}));
-        });
     }
     else {
         ws.send(serializeData('notready', {}));
@@ -124,7 +121,8 @@ wss.on('connection', function(ws) {
             var data = JSON.parse(strs[2]);
             socketEmitter.emit(event_type, data, ws);
         } catch (e) {
-			console.error("Can't parse "+msg.data+": "+e.message);
+			console.error("Can't parse "+msg.data);
+			console.log(e);
             ws.send("HEY DON'T FUCK WITH ME! ");
         }
     });

@@ -13,11 +13,11 @@ function RoomController(broadcast) {
     this.teams = {
         left: {
             summoners: [],
-            demons: []
+            demon: null
         },
         right: {
             summoners: [],
-            demons: []
+            demon: null
         }
     };
     this.started = false;
@@ -26,9 +26,11 @@ function RoomController(broadcast) {
 RoomController.prototype.ritualInterval = 20000;
 
 RoomController.prototype.addSummoner = function(summoner) {
-    pickATeamAndAdd(summoner, this);
+     pickATeamAndAdd(summoner, this);
     this.summoner_count += 1;
 	this.broadcast('newritual', this.current_ritual, [summoner.socket]);
+	this.broadcast('teaminfo', this.teams);
+	this.broadcast('joined', {}, [summoner.socket]);
 	console.log("Summoners: "+this.summoner_count);
 };
 
@@ -60,33 +62,21 @@ function findAndRemoveSummoner(summoner, that) {
     return res;
 }
 
-RoomController.prototype.addDemon = function(demon, team) {
-    var receiving_team;
-    switch(team) {
-        case "left":
-            receiving_team = this.teams.left;
-            break;
-        case "right":
-            receiving_team = this.teams.right;
-            break;
-    }
-
-    receiving_team.demons.push(demon);
-};
-
 RoomController.prototype.getAllSummoners = function() {
     return this.teams.left.summoners.concat(this.teams.right.summoners);
 };
 
 RoomController.prototype.readyToStart = function() {
+	return true;
     return this.teams.left.summoners.length && this.teams.right.summoners.length;
 };
 
 RoomController.prototype.startGame = function(demons) {
-    this.teams.left.demons.push(demons.pop());
-    this.teams.right.demons.push(demons.pop());
+    this.teams.left.demon = demons.pop();
+    this.teams.right.demon = demons.pop();
     this.started = true;
 	this.pickRitual();
+	this.broadcast('gamestarted',{num_players: this.getAllSummoners().length});
 };
 
 RoomController.prototype.stopGame = function() {
@@ -112,7 +102,7 @@ RoomController.prototype.ritualObserved = function(ritual, ws) {
 		team.summoners.forEach(function(summoner) {
 			if(summoner.socket == ws) {
 				summoner.score += ritual.value;
-				team.demons[0].observeRitual(ritual);
+				team.demon.observeRitual(ritual);
 				this.broadcast('teaminfo', this.teams);
 				console.log(JSON.stringify(this.teams, null, 2));
 			}
