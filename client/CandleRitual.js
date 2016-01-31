@@ -57,6 +57,7 @@ CandleRitual.prototype.draw = function(ctx, canvasSize) {
 	var self = this;
 	if(this.lit) {
 		ctx.sr(function() {
+			ctx.beginPath();
 			ctx.fillStyle = 'white';
 			ctx.arc(self.x * canvasSize.w, self.y * canvasSize.h, 16, 0, 2 * Math.PI, false);
 			ctx.fill();
