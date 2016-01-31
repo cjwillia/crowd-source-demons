@@ -1,8 +1,19 @@
+var notes = [];
+for(var i = 0; i < 5; i++) {
+	var note = document.createElement('audio');
+	note.src = ['sounds/note',i + 1,'.ogg'].join('');
+	note.loop = true;
+	notes[i] = note;
+	this.showing = false;
+}
+
 function HoldRitual(game, config) {
 	Ritual.apply(this, arguments);
 	this.x = config.x;
 	this.y = config.y;
 	this.held = false;
+
+	this.sound = notes[config.soundIndex];
 
 	this.touchBound = this.touch.bind(this)
 }
@@ -21,9 +32,13 @@ HoldRitual.prototype.destroy = function() {
 	['touchstart', 'touchend', 'touchmove'].forEach(function(e) {
 		this.game.canvas.removeEventListener(e, this.touchBound);
 	}, this);
+	this.sound.pause();
 };
 
 HoldRitual.prototype.touch = function(e) {
+	var wasHeld = this.held;
+	if(!this.showing)
+		return;
 	this.held = false;
 	var px = this.x * this.game.canvasSize.w;
 	var py = this.y * this.game.canvasSize.h;
@@ -33,6 +48,11 @@ HoldRitual.prototype.touch = function(e) {
 		if(dist < this.circleRadius * this.game.canvasSize.min)
 			this.held = true;
 	}
+
+	if(this.held && !wasHeld)
+		this.sound.play();
+	if(wasHeld && !this.held)
+		this.sound.pause();
 };
 
 HoldRitual.prototype.circleRadius = 0.075;
@@ -42,6 +62,9 @@ HoldRitual.prototype.isFulfilled = function() {
 };
 
 HoldRitual.prototype.draw = function(ctx, canvasSize) {
+	if(!this.showing)
+		return;
+
 	var radPix = this.circleRadius * canvasSize.min;
 
 	var self = this;
