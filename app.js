@@ -79,7 +79,7 @@ app.use(function(err, req, res, next) {
 // websocket nonsense etc
 
 socketEmitter.on('ritualfulfilled', function(data, ws) {
-    console.log(data);
+	room.ritualObserved(data, ws);
 });
 
 socketEmitter.on('createroom', function(data, ws) {

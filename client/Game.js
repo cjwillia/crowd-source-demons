@@ -112,6 +112,9 @@ Game.prototype.gotData = function(e) {
 				case "newritual":
 					this.setRitualConfig(body);
 					break;
+				case "noroom":
+					alert("No room. Reload this page later.");
+					break;
 				default:
 					console.error("%s? %s?! What do I do with this?", type, type);
 			}

@@ -1,9 +1,9 @@
 var rituals = [
-	{type: 'RotationRitual'},
-	{type: 'VoodooRitual', count: 4},
-	{type: 'DemonChordRitual', count: 4},
-	{type: 'TypingRitual'},
-	{type: 'CandlesRitual', count: 5}
+	{type: 'RotationRitual', value: 1},
+	{type: 'VoodooRitual', count: 4, value: 1},
+	{type: 'DemonChordRitual', count: 4, value: 1},
+	{type: 'TypingRitual', value: 1},
+	{type: 'CandlesRitual', count: 5, value: 1}
 ];
 
 function RoomController(broadcast) {
@@ -105,6 +105,19 @@ RoomController.prototype.pickRitual = function() {
 RoomController.prototype.setRitual = function(r) {
 	this.current_ritual = r;
 	this.broadcast('newritual', this.current_ritual);
+};
+
+RoomController.prototype.ritualObserved = function(ritual, ws) {
+	[this.teams.left, this.teams.right].forEach(function(team) {
+		team.summoners.forEach(function(summoner) {
+			if(summoner.socket == ws) {
+				summoner.score += ritual.value;
+				team.demons[0].observeRitual(ritual);
+				this.broadcast('teaminfo', this.teams);
+				console.log(JSON.stringify(this.teams, null, 2));
+			}
+		}, this);
+	}, this);
 };
 
 module.exports = RoomController;

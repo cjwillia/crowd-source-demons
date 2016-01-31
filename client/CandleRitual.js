@@ -1,10 +1,16 @@
 var candleSound = document.createElement('audio');
 candleSound.src = 'sounds/candle.ogg';
 
+var unlitImage = document.createElement('img');
+unlitImage.src = 'images/candle-unlit.png';
+
+var litImage = document.createElement('img');
+litImage.src = 'images/candle-lit.png';
+
 function CandleRitual() {
 	Ritual.apply(this, arguments);
-	this.x = this.config.x;
-	this.y = this.config.y;
+	this.x = Math.random();
+	this.y = Math.random();
 
 	this.lit = false;
 
@@ -73,6 +79,13 @@ CandleRitual.prototype.draw = function(ctx, canvasSize) {
 			ctx.fill();
 		}
 	});
+};
+
+CandleRitual.prototype.reset = function() {
+	Ritual.prototype.reset.apply(this, arguments);
+	this.x = Math.random();
+	this.y = Math.random();
+	this.lit = false;
 };
 
 CandleRitual.prototype.destroy = function() {
