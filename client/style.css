@@ -30,3 +30,18 @@ button.save {
 	left: 20%;
 	width: 60%;
 }
+
+.teamColumn {
+	width: 320px;
+	border-left: solid 2px;
+	border-right: solid 2px;
+}
+
+.mainColumn {
+	flex: 1 1 auto;
+}
+
+.columnParent {
+	display: flex;
+	flex-direction: row;
+}
