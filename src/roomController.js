@@ -1,5 +1,15 @@
-function RoomController() {
+var rituals = [
+	{type: 'RotationRitual'},
+	{type: 'VoodooRitual', count: 4},
+	{type: 'DemonChordRitual', count: 4},
+	{type: 'TypingRitual'},
+	{type: 'CandlesRitual', count: 5}
+];
+
+function RoomController(broadcast) {
+	this.broadcast = broadcast;
     this.summoner_count = 0;
+	this.current_ritual = null;
     this.teams = {
         left: {
             summoners: [],
@@ -13,9 +23,13 @@ function RoomController() {
     this.started = false;
 }
 
+RoomController.prototype.ritualInterval = 10000;
+
 RoomController.prototype.addSummoner = function(summoner) {
     pickATeamAndAdd(summoner, this);
     this.summoner_count += 1;
+	this.broadcast('newritual', this.current_ritual, [summoner.socket]);
+	console.log("Summoners: "+this.summoner_count);
 };
 
 function pickATeamAndAdd(summoner, that) {
@@ -72,6 +86,25 @@ RoomController.prototype.startGame = function(demons) {
     this.teams.left.demons.push(demons.pop());
     this.teams.right.demons.push(demons.pop());
     this.started = true;
+	this.pickRitual();
+};
+
+RoomController.prototype.stopGame = function() {
+	this.started = false;
+	this.setRitual(null);
+}
+
+RoomController.prototype.pickRitual = function() {
+	if(this.started) {
+		var i = Math.floor(Math.random() * rituals.length);
+		this.setRitual(rituals[i]);
+		setTimeout(this.pickRitual.bind(this), this.ritualInterval)
+	}
+};
+
+RoomController.prototype.setRitual = function(r) {
+	this.current_ritual = r;
+	this.broadcast('newritual', this.current_ritual);
 };
 
 module.exports = RoomController;

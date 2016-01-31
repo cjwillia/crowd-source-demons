@@ -15,7 +15,6 @@ function letsGetThisPartyStarted() {
 	});
 
 	document.body.addEventListener('touchstart', function() {
-		return;
 		if(document.body.requestFullScreen)
 			document.body.requestFullScreen();
 	});
