@@ -78,19 +78,19 @@ button.save {
 	100% { opacity: 0; transform: scale(0); }
 }
 
-#team1list .score {
+#leftTeamList .score {
 	float: right;
 }
 
-#team1list .name {
+#leftTeamList .name {
 	float: left;
 }
 
-#team2list .score {
+#rightTeamList .score {
 	float: left;
 }
 
-#team2list .name {
+#rightTeamList .name {
 	float: right;
 }
 
@@ -140,10 +140,10 @@ button.save {
 	width: 50%;
 }
 
-#team1Demon {
+#leftDemon {
 	border-right: solid 2px;
 }
 
-#team2Demon {
+#rightDemon {
 	border-left: solid 2px;
 }
