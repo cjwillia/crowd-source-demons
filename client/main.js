@@ -18,6 +18,10 @@ function letsGetThisPartyStarted() {
 		if(document.body.requestFullScreen)
 			document.body.requestFullScreen();
 	});
+
+	document.body.addEventListener('touchmove', function(e) {
+		e.preventDefault();
+	});
 }
 
 function distance(x1, y1, x2, y2) {
