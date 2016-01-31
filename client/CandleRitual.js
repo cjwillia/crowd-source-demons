@@ -54,6 +54,16 @@ CandleRitual.prototype.draw = function(ctx, canvasSize) {
 	var widthPix = this.width * canvasSize.min;
 	var heightPix = this.height * canvasSize.min;
 
+	var self = this;
+	if(this.lit) {
+		ctx.sr(function() {
+			ctx.beginPath();
+			ctx.fillStyle = 'white';
+			ctx.arc(self.x * canvasSize.w, self.y * canvasSize.h, 16, 0, 2 * Math.PI, false);
+			ctx.fill();
+		});
+	}
+
 	ctx.drawImage(this.lit ? litImage : unlitImage, this.x * canvasSize.w - 19, this.y * canvasSize.h - 6);
 };
 

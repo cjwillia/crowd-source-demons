@@ -75,10 +75,10 @@ RotationRitual.prototype.draw = function(ctx, canvasSize) {
 
 	ctx.sr(function() {
 		ctx.translate(canvasSize.w / 2, canvasSize.h / 2);
-		ctx.rotate(self.targetAngle / 180 * Math.PI);
-		ctx.drawImage(summoningCircle, shakeX - imageSize * scale * 0.5, shakeY - imageSize * scale * 0.5, imageSize * scale, imageSize * scale);
 		ctx.rotate(-self.targetAngle / 180 * Math.PI);
-		ctx.rotate(self.actualAngle / 180 * Math.PI);
+		ctx.drawImage(summoningCircle, shakeX - imageSize * scale * 0.5, shakeY - imageSize * scale * 0.5, imageSize * scale, imageSize * scale);
+		ctx.rotate(self.targetAngle / 180 * Math.PI);
+		ctx.rotate(-self.actualAngle / 180 * Math.PI);
 		ctx.drawImage(summoningCircle, shakeX - imageSize * scale * 0.5, shakeY - imageSize * scale * 0.5, imageSize * scale, imageSize * scale);
 	});
 
